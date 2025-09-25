@@ -58,7 +58,7 @@ README.md                     # this file
 
 - https://github.com/Damocles-fr/jellyfin-nas-hdd-spinup/releases
 - Upload the ZIP from  (e.g. to `/share/Public/`), then:
-- Some QNAP tasks (cron edits, device access) require the **real** admin user, even if you are administrator too.
+- Some QNAP tasks (cron edits, device access) require the **real admin user**, even if you are administrator too.
 
 ```sh
 cd /share/Public
