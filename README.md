@@ -9,6 +9,7 @@ This tiny watcher tails Jellyfin logs for **`WebSocketManager: WS "IP" request`*
 This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads without spinning the disks) so the HDDs are already awake when you hit **Play**.
 
 > **Not triggered on the login page** — it fires right after the WebSocket is established (typically on/after the **home** page).
+
 > **LAN optional**
 
 ---
