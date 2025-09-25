@@ -24,7 +24,7 @@ This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads withou
 
 ## Supported / Tested
 
-- **Tested: QNAP R-004** and QNAP **HS‑264**, QTS 5.x, Jellyfin **.qpkg** (logs under `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`), SSH as **admin** (PuTTY).
+- **Tested: QNAP TR-004** and QNAP **HS‑264**, QTS 5.x, Jellyfin **.qpkg** (logs under `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`), SSH as **admin** (PuTTY).
 - **Should also work** on similar QNAP models/firmware with the same log layout and md RAID devices.
 - **Requirements:** BusyBox `/bin/sh`, `tail`, `dd`, `awk`, `grep`, `cron`. `sg_start` is **optional** (if present, we use it).
 
