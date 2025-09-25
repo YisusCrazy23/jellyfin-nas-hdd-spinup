@@ -56,8 +56,8 @@ README.md                     # this file
 
 ## Quick install (QNAP, SSH as **admin**)
 
-https://github.com/Damocles-fr/jellyfin-nas-hdd-spinup/releases
-Upload the ZIP from  (e.g. to `/share/Public/`), then:
+- https://github.com/Damocles-fr/jellyfin-nas-hdd-spinup/releases
+- Upload the ZIP from  (e.g. to `/share/Public/`), then:
 
 ```sh
 cd /share/Public
