@@ -59,6 +59,7 @@ README.md                     # this file
 ## Quick install (QNAP, SSH as **admin**)
 
 - https://github.com/Damocles-fr/jellyfin-nas-hdd-spinup/releases
+- Look at 'Configuration' before running install.sh
 - Upload the ZIP from  (e.g. to `/share/Public/`), then:
 - Some QNAP tasks (cron edits, device access) require the **real admin user**, even if you are administrator too.
 
