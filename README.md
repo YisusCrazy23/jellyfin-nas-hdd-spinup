@@ -1,5 +1,5 @@
 
-# Jellyfin NAS HDD Spin‑Up at Homepage (QNAP‑friendly, WAN‑only)
+# Jellyfin NAS HDD Spin‑Up at Homepage
 
 Spin up your **NAS hard drives** automatically **right after a remote client reaches Jellyfin’s home screen** so the first **Play** is fast.  
 This tiny watcher tails Jellyfin logs for **`WebSocketManager: WS "IP" request`** and, for **public (WAN) IPs**, immediately issues a **read‑only** wake:
