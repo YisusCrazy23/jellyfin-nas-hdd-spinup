@@ -54,11 +54,6 @@ LICENSE                       # MIT
 README.md                     # this file
 ```
 
-**Suggested GitHub topics:**  
-`jellyfin`, `qnap`, `nas`, `hdd`, `spin-up`, `spindown`, `tr-004`, `websocket`, `wan`, `ssd-cache`, `ext4`, `busybox`, `shell-script`
-
----
-
 ## Quick install (QNAP, SSH as **admin**)
 
 Upload the ZIP (e.g. to `/share/Public/`), then:
