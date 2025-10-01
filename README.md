@@ -10,6 +10,7 @@ This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads withou
 > **Not triggered on the login page** — it fires right after the WebSocket is established (typically on the **home** page).
 
 > **LAN optional**
+
 ---
 
 ## Supported / Tested
