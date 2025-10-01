@@ -140,11 +140,9 @@ README.md                     # this file
 
 ---
 
-## GitHub tags / topics
+## GitHub
 
-```
-jellyfin nas qnap tr-004 hdd spinup wake disks homepage websocket sg_start sg3_utils qpkg qts
-```
+https://github.com/Damocles-fr/
 
 ---
 
