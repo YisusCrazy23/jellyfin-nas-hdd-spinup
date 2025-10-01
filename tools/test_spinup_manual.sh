@@ -1,12 +1,9 @@
-
 #!/bin/sh
-# Manual wake: read small block from md + optional sg_start for member disks.
+# Manual wake: tiny read on data md + optional sg_start on member disks.
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
-FORCE_MD=""  # set e.g. "md3" to override
 
-pick_data_md(){
-  [ -n "$FORCE_MD" ] && { echo "$FORCE_MD"; return; }
+pick_data_md() {
   awk '
     /^md[0-9]+ :/ {md=$1; next}
     /blocks/ && md!=""{print md,$1; md=""}
@@ -17,7 +14,7 @@ pick_data_md(){
   | awk '{print $1}'
 }
 
-md_bases(){
+md_bases() {
   MD="$1"
   [ -z "$MD" ] && return 0
   line="$(awk -v M="$MD" '$1==M{print;exit}' /proc/mdstat 2>/dev/null)"
@@ -32,20 +29,17 @@ md_bases(){
 
 MD="$(pick_data_md)"
 if [ -b "/dev/$MD" ]; then
-  echo "[*] Reading 4 KiB from /dev/$MD ..."
+  echo "[i] Reading small block from /dev/$MD ..."
   dd if="/dev/$MD" of=/dev/null bs=4K count=4 2>/dev/null || true
 else
-  echo "[!] Could not determine a data md device."
+  echo "[!] No suitable data md device found."
 fi
 
 if command -v sg_start >/dev/null 2>&1; then
   for d in $(md_bases "$MD"); do
-    [ -b "$d" ] || continue
-    echo "[*] Sending SCSI START to $d ..."
+    echo "[i] Sending sg_start --start to $d"
     sg_start --start "$d" >/dev/null 2>&1 || true
   done
 else
-  echo "[i] sg_start not found; skipping SCSI START step."
+  echo "[i] sg_start not found; skipping SCSI START."
 fi
-
-echo "[✓] Manual spin-up sequence completed."
