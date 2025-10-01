@@ -140,7 +140,7 @@ README.md                     # this file
 
 ---
 
-## GitHub
+## GitHub tags / topics
 
 https://github.com/Damocles-fr/
 
