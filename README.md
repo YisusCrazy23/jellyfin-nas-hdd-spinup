@@ -74,7 +74,7 @@ Let disks spin down, then open Jellyfin from **WAN/4G** → the watcher should p
 
 ### After a reboot
 
-It should come back automatically via **cron guard** and an **rc.local** fallback. If it doesn’t, re‑seed cron (some need this once):
+It should come back automatically via **cron guard** and an **rc.local** fallback. If it doesn’t, try this cron (some need this once):
 
 ```sh
 cd /share/Public/jellyfin-HDD-spinup
