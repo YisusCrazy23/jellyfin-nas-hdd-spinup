@@ -20,6 +20,24 @@ This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads withou
 
 ---
 
+## Configuration
+
+Edit the header of `bin/spinup_ws_login.sh` **before** running `install.sh` (or re‑install after changes):
+
+- `LOG_DIR` — Jellyfin logs (qpkg default):  
+  `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`
+- `COOLDOWN` — seconds between wake actions (default **150**).
+- `SLEEP` — main loop sleep in seconds (default **2**).
+- `ALLOW_PRIVATE` — **0** = WAN‑only (default), **1** = also trigger for **private/LAN** IPs.
+- `TRIGGER_PATTERN` — regex for matching lines (default: **`WebSocketManager: WS ".*" request`**).  
+  To broaden:  
+  `TRIGGER_PATTERN='WebSocketManager: WS ".*" (request|open)|Authenticated|User logged in'`
+- `FORCE_MD` — override auto md detection, e.g. `FORCE_MD="md3"`.
+
+Keep the **cooldown** if you broaden triggers to avoid unnecessary I/O.
+
+---
+
 ## Quick install (QNAP, SSH as **admin**)
 
 Unzip (e.g. to `/share/Public/`), then:
@@ -40,24 +58,6 @@ ps | grep '[s]pinup_ws_login.sh'
 Let disks spin down, then open Jellyfin from **WAN/4G** → the watcher should pre‑wake HDDs on the **home** screen.
 
 > The watcher is installed to: `/etc/config/jellyfin-hdd-spinup/spinup_ws_login.sh` (persistent) — **not** on your media volume.
-
----
-
-## Configuration
-
-Edit the header of `bin/spinup_ws_login.sh` **before** running `install.sh` (or re‑install after changes):
-
-- `LOG_DIR` — Jellyfin logs (qpkg default):  
-  `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`
-- `COOLDOWN` — seconds between wake actions (default **150**).
-- `SLEEP` — main loop sleep in seconds (default **2**).
-- `ALLOW_PRIVATE` — **0** = WAN‑only (default), **1** = also trigger for **private/LAN** IPs.
-- `TRIGGER_PATTERN` — regex for matching lines (default: **`WebSocketManager: WS ".*" request`**).  
-  To broaden:  
-  `TRIGGER_PATTERN='WebSocketManager: WS ".*" (request|open)|Authenticated|User logged in'`
-- `FORCE_MD` — override auto md detection, e.g. `FORCE_MD="md3"`.
-
-Keep the **cooldown** if you broaden triggers to avoid unnecessary I/O.
 
 ---
 
