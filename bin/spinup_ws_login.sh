@@ -1,6 +1,8 @@
 #!/bin/sh
-# Jellyfin WAN WebSocket "request" -> spin-up (md + sg_start), cooldown, BusyBox-friendly.
-# Single-instance, log-rotation aware, minimal I/O (read-only).
+# Jellyfin WAN WebSocket "request" -> spin-up (sg_start-only), cooldown, BusyBox-friendly.
+# Single-instance, log-rotation aware, minimal and safe.
+#
+# Tested on: QNAP HS-264, QTS 5 (admin over SSH)
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
@@ -8,9 +10,10 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin
 LOG_DIR="${LOG_DIR:-/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs}"
 COOLDOWN="${COOLDOWN:-150}"          # seconds between actions
 SLEEP="${SLEEP:-2}"                  # main loop tick
-ALLOW_PRIVATE="${ALLOW_PRIVATE:-0}"  # 0 = WAN-only (default), 1 = include LAN/private IPs
+BOOT_WAIT="${BOOT_WAIT:-420}"        # min uptime before acting (7 min)
+ALLOW_PRIVATE="${ALLOW_PRIVATE:-0}"  # 0 = WAN-only, 1 = include LAN/private IPs
 TRIGGER_PATTERN="${TRIGGER_PATTERN:-WebSocketManager: WS \".*\" request}"  # grep -E pattern
-FORCE_MD="${FORCE_MD:-}"             # e.g. md3 to force, else auto-pick largest data md
+FORCE_MD="${FORCE_MD:-}"             # e.g. md3 to force the data array
 
 LOCKDIR="/var/run/spinup_ws.lock"
 TAILPID=""
@@ -23,7 +26,10 @@ is_private_ip() {
   esac
 }
 
-# Pick the largest md device that looks like "data" (exclude md9/md13/md321 etc. meta/system)
+uptime_secs() {
+  awk '{printf "%d", $1}' /proc/uptime 2>/dev/null
+}
+
 pick_data_md() {
   awk '
     /^md[0-9]+ :/ {md=$1; next}
@@ -35,7 +41,6 @@ pick_data_md() {
   | awk '{print $1}'
 }
 
-# List unique base disks (/dev/sdX) that belong to a given md device
 md_bases() {
   MD="$1"
   [ -z "$MD" ] && return 0
@@ -49,13 +54,15 @@ md_bases() {
   echo "$BASES"
 }
 
-# Perform a minimal, read-only wake on the array + explicit SCSI START if available
 spin_up_once() {
+  # Honor boot wait regardless of who started us
+  up="$(uptime_secs)"
+  [ -n "$up" ] && [ "$up" -lt "$BOOT_WAIT" ] && return 0
+
   MD="$FORCE_MD"
   [ -z "$MD" ] && MD="$(pick_data_md)"
-  if [ -n "$MD" ] && [ -b "/dev/$MD" ]; then
-    dd if="/dev/$MD" of=/dev/null bs=4K count=4 2>/dev/null
-  fi
+
+  # sg_start-only: do not read from md or the filesystem
   if command -v sg_start >/dev/null 2>&1; then
     for d in $(md_bases "$MD"); do
       [ -b "$d" ] && sg_start --start "$d" >/dev/null 2>&1 || true
@@ -67,11 +74,9 @@ latest_log() { ls -t "$LOG_DIR"/log_*.log 2>/dev/null | head -n1; }
 
 start_tailproc() {
   [ -n "$TAILPID" ] && kill "$TAILPID" 2>/dev/null
-  # Pipe tail to a line reader (no extra logs)
   tail -n 0 -f "$CURRENT_FILE" 2>/dev/null | while IFS= read -r line; do
     echo "$line" | grep -E -q "$TRIGGER_PATTERN" || continue
 
-    # Find the first IPv4 candidate
     WAN=""
     for cand in $(echo "$line" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'); do
       if [ "$ALLOW_PRIVATE" = "1" ]; then

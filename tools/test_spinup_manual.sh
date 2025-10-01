@@ -1,7 +1,9 @@
 #!/bin/sh
-# Manual wake: tiny read on data md + optional sg_start on member disks.
+# Manual wake using sg_start on member disks (no reads).
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+uptime_secs() { awk '{printf "%d", $1}' /proc/uptime 2>/dev/null; }
 
 pick_data_md() {
   awk '
@@ -27,19 +29,20 @@ md_bases() {
   echo "$BASES"
 }
 
-MD="$(pick_data_md)"
-if [ -b "/dev/$MD" ]; then
-  echo "[i] Reading small block from /dev/$MD ..."
-  dd if="/dev/$MD" of=/dev/null bs=4K count=4 2>/dev/null || true
-else
-  echo "[!] No suitable data md device found."
+BOOT_WAIT="${BOOT_WAIT:-420}"
+up="$(uptime_secs)"
+if [ -n "$up" ] && [ "$up" -lt "$BOOT_WAIT" ]; then
+  echo "[i] Uptime ${up}s < BOOT_WAIT ${BOOT_WAIT}s — delaying manual wake."
+  exit 0
 fi
 
-if command -v sg_start >/dev/null 2>&1; then
-  for d in $(md_bases "$MD"); do
-    echo "[i] Sending sg_start --start to $d"
-    sg_start --start "$d" >/dev/null 2>&1 || true
-  done
-else
-  echo "[i] sg_start not found; skipping SCSI START."
+MD="$(pick_data_md)"
+if ! command -v sg_start >/dev/null 2>&1; then
+  echo "[!] sg_start not found. Install sg3_utils or use the watcher once available."
+  exit 1
 fi
+
+for d in $(md_bases "$MD"); do
+  echo "[i] Sending sg_start --start to $d"
+  sg_start --start "$d" >/dev/null 2>&1 || true
+done

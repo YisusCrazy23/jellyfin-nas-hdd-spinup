@@ -1,5 +1,5 @@
 #!/bin/sh
-# Show WAN WebSocket trigger lines in real time (no spin-up).
+# Show WebSocket 'request' lines in real time (no spin-up). WAN/LAN policy applies.
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
