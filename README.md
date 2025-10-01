@@ -6,12 +6,11 @@ This tiny watcher tails Jellyfin logs for `WebSocketManager: WS "IP" request` an
 - Triggers **SCSI START UNIT** (`sg_start --start`) on the **member disks of your data RAID** (auto‑detected from `/proc/mdstat`).
 - **No filesystem writes** and **no block reads** — avoids SSD‑cache traps and reduces the risk of “aborted command / read‑only remounts.”
 - Built‑in **cooldown** (default 150s) to prevent repeated wake‑ups.
-- **Boot wait** (default 420s ≈ 7 minutes): the watcher self‑delays after NAS startup to let QNAP services settle.
+- **Boot wait** (default **300s ≈ 5 minutes**) so QNAP services can settle after startup.
 
 This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads without spinning the disks) so the HDDs are already awake when you hit **Play**.
 
-> **Not triggered on the login page** — it fires right after the WebSocket is established (typically on the **home** page).
->
+> **Not triggered on the login page** — it fires right after the WebSocket is established (typically on the **home** page).  
 > **LAN optional** — by default only WAN clients trigger; LAN can be enabled.
 
 ---
@@ -40,14 +39,14 @@ Edit the header of `bin/spinup_ws_login.sh` **before** running `install.sh` (or 
 - `LOG_DIR` — Jellyfin logs folder. Default: `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`
 - `COOLDOWN` — seconds between spin-ups. Default: `150`
 - `SLEEP` — main loop tick. Default: `2`
-- `BOOT_WAIT` — **minimum uptime** (seconds) before doing anything. Default: `420` (7 minutes)
+- `BOOT_WAIT` — **minimum uptime** (seconds) before doing anything. Default: `300` (≈ 5 minutes)
 - `ALLOW_PRIVATE` — `0` = only WAN clients (default), `1` = also trigger for LAN/private IPs
-- `TRIGGER_PATTERN` — grep‑E pattern for Jellyfin log lines. Default: `WebSocketManager: WS ".*" request`
+- `TRIGGER_PATTERN` — `grep -E` pattern for Jellyfin log lines. Default: `WebSocketManager: WS ".*" request`
 - `FORCE_MD` — set to e.g. `md3` to force which md array to wake instead of auto‑detecting the largest data md
 
 Keep the **cooldown** if you broaden triggers to avoid unnecessary I/O.
 
-> The service **self-delays ~7 minutes after boot** (configurable) even if started by cron earlier. This avoids races during QNAP startup.
+> The service self‑delays **~5 minutes after boot** (configurable) even if cron starts it earlier. This avoids races during QNAP startup.
 
 ---
 
@@ -72,15 +71,6 @@ Let disks spin down, then open Jellyfin from **WAN/4G** → the watcher should p
 
 > The watcher is installed to: `/etc/config/jellyfin-hdd-spinup/spinup_ws_login.sh` (persistent) — **not** on your media volume.
 
-### After a reboot
-
-It should come back automatically via **cron guard** and an **rc.local** fallback. If it doesn’t, try this cron (some need this once):
-
-```sh
-cd /share/Public/jellyfin-HDD-spinup
-sh ./crontab.sh
-```
-
 ---
 
 ## Uninstall
@@ -90,7 +80,7 @@ cd /share/Public/jellyfin-HDD-spinup   # or wherever you unzipped it
 sh ./uninstall.sh
 ```
 
-Removes the watcher, the cron guard, and the `rc.local` hook, and deletes `/etc/config/jellyfin-hdd-spinup/`.
+This stops the watcher, removes the cron guard/boot‑seeder, reloads `crond`, and deletes `/etc/config/jellyfin-hdd-spinup/`. It also cleans any legacy `rc.local` line that referenced this project (if present).
 
 ---
 
@@ -122,9 +112,8 @@ This **only** sends SCSI START UNIT to the detected member disks. **It does not 
 
 ```
 bin/spinup_ws_login.sh        # watcher (single-instance, WAN filter, cooldown, BusyBox-friendly)
-install.sh                    # idempotent installer (/etc/config/jellyfin-hdd-spinup/ + cron guard + rc.local hook)
-crontab.sh                    # helper to re-seed cron spool on boxes that forget on boot
-uninstall.sh                  # clean removal (kills watcher, removes cron guard and rc.local hook)
+install.sh                    # idempotent installer (/etc/config + cron guard + boot-seeder)
+uninstall.sh                  # clean removal (kills watcher, removes cron lines, cleans legacy rc.local)
 tools/test_detect.sh          # detect WAN WebSocket “request” lines (no spin-up)
 tools/test_spinup_manual.sh   # manual wake: SCSI START UNIT only (no reads)
 LICENSE                       # MIT
@@ -133,14 +122,14 @@ README.md                     # this file
 
 ## Safety & Scope
 
-- **Read‑only control**: no filesystem writes and **no reads** from your data arrays.
+- **Read‑only control**: no filesystem writes and **no data reads** from your arrays.
 - Lives under `/etc/config/jellyfin-hdd-spinup/` (system config), **not** on your media volume.
 - **WAN‑only** by default; enable LAN with `ALLOW_PRIVATE=1` if desired.
 - Single instance with lock; cron guard is BusyBox‑compatible.
 
 ---
 
-## GitHub tags / topics
+## GitHub
 
 https://github.com/Damocles-fr/
 

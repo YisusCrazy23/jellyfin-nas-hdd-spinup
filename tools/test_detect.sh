@@ -1,25 +1,17 @@
 #!/bin/sh
-# Live detection of Jellyfin WAN WebSocket "request" lines (no spin-up)
+# Tail the latest Jellyfin log and print WAN WebSocket detections (no spin-up)
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 LOG_DIR="/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs"
-TRIGGER_PATTERN='WebSocketManager: WS ".*" request'
 
-latest_log() { ls -t "$LOG_DIR"/log_*.log 2>/dev/null | head -n1; }
-is_private_ip(){ case "$1" in 10.*|127.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[0-1].*) return 0;; *) return 1;; esac; }
-
-LATEST="$(latest_log)"
+LATEST=$(ls -t "$LOG_DIR"/log_*.log 2>/dev/null | head -n1)
 if [ -z "$LATEST" ]; then
-  echo "No Jellyfin log file found in $LOG_DIR"
+  echo "No log file found in $LOG_DIR"
   exit 1
 fi
 
-echo "Tailing: $LATEST"
-tail -n0 -f "$LATEST" 2>/dev/null | while IFS= read -r line; do
-  echo "$line" | grep -E -q "$TRIGGER_PATTERN" || continue
-  WAN=""
-  for cand in $(echo "$line" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'); do
-    if ! is_private_ip "$cand"; then WAN="$cand"; break; fi
-  done
-  [ -z "$WAN" ] && continue
-  echo "DETECTED WAN WebSocket 'request' from $WAN @ $(date)"
+tail -n0 -F "$LATEST" | while read -r line; do
+  echo "$line" | grep -q 'WebSocketManager: WS ".*" request' || continue
+  ip=$(echo "$line" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -n1)
+  case "$ip" in 10.*|127.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[0-1].*) continue;; esac
+  echo "DETECTED WAN WebSocket 'request' from $ip @ $(date)"
 done
